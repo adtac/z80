@@ -11,7 +11,7 @@ public:
 
   rom();
 
-  int load_file(char* filename);
+  int load_file(char*);
 };
 
 #endif
