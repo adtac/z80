@@ -4,11 +4,14 @@
 #include <stdint.h>
 
 class rom {
+  uint64_t rom_size;
   uint8_t* data;
 
 public:
 
-  rom(char* filename);
+  rom();
+
+  int load_file(char* filename);
 };
 
 #endif

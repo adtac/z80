@@ -6,4 +6,5 @@ file(GLOB LIB_SOURCES *.cpp)
 file(GLOB LIB_HEADERS *.hpp)
 
 add_library(rom ${LIB_SOURCES} ${LIB_HEADERS})
+target_link_libraries(rom utils)
 target_compile_definitions(rom PUBLIC)
