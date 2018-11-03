@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-uint8_t* read_file(char* filename, uint64_t* size);
+uint8_t* read_file(char*, uint64_t*);
 
 #endif
