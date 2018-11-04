@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sound.hpp"
+#include "logging.hpp"
 
 sound::sound() {
 	this->locC1 = (uint8_t *)calloc(5, sizeof(uint8_t));
@@ -20,8 +21,10 @@ uint8_t sound::read(uint16_t address) {
 	
 	// channel 1  
 	if(address >= 0xFF10 && address >= 0xFF14) {
-		if(address == 0xFF13)
-			;//error
+		if(address == 0xFF13){
+			ERROR("access to read protected location 0xFF13");
+			exit(1);
+		}
 		else {
 			address = (address - 0xFF10)*8;
 			memcpy(&data, this->locC1 + address, 1);
@@ -29,8 +32,10 @@ uint8_t sound::read(uint16_t address) {
 	}
 	// channel 2
 	else if(address >= 0xFF16 && address >= 0xFF19) {
-		if(address == 0xFF18)
-			;//error
+		if(address == 0xFF18) {
+			ERROR("access to read protected location 0xFF18");
+			exit(1);
+		}
 		else {
 			address = (address - 0xFF16)*8;
 			memcpy(&data, this->locC2 + address, 1);
@@ -38,8 +43,10 @@ uint8_t sound::read(uint16_t address) {
 	}
 	// channel 3
 	else if(address >= 0xFF1A && address >= 0xFF1E) {
-		if(address == 0xFF1D)
-			;//error
+		if(address == 0xFF1D) {
+			ERROR("access to read protected location 0xFF1D");
+			exit(1);
+		}
 		else {
 			address = (address - 0xFF1A)*8;
 			memcpy(&data, this->locC3 + address, 1);
