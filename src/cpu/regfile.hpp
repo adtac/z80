@@ -43,6 +43,7 @@ public:
   uint16_t get16(int);
   void set16(int, uint16_t);
 
+  void mkbit8(int, int, bool);
   void setbit8(int, int);
   void clrbit8(int, int);
   bool chkbit8(int, int);

@@ -21,6 +21,13 @@ void regfile::set16(int idx, uint16_t val) {
   *((uint16_t*) (regs + idx)) = val;
 }
 
+void regfile::mkbit8(int idx, int bit, bool status) {
+  if (status)
+    setbit8(idx, bit);
+  else
+    clrbit8(idx, bit);
+}
+
 void regfile::setbit8(int idx, int bit) {
   *((uint8_t*) (regs + idx)) |= (1 << (bit - 1));
 }
