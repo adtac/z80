@@ -18,6 +18,12 @@ class mmu {
 		// static memory 
 		uint8_t * wram;
 		uint8_t * vram;
+		uint8_t * locUKNS;
+		uint8_t locFF4D;
+		uint8_t locFF56;
+		uint8_t locFF70;
+		uint8_t INTENBL;
+		uint8_t INTFLAG;
 
 		// cartridge memory 
 		cartridge * crt;
