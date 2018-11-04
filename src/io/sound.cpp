@@ -24,7 +24,7 @@ uint8_t sound::read(uint16_t address) {
 			;//error
 		else {
 			address = (address - 0xFF10)*8;
-			memcpy(&data, this->locC1 + address, 8);
+			memcpy(&data, this->locC1 + address, 1);
 		}
 	}
 	// channel 2
@@ -33,7 +33,7 @@ uint8_t sound::read(uint16_t address) {
 			;//error
 		else {
 			address = (address - 0xFF16)*8;
-			memcpy(&data, this->locC2 + address, 8);
+			memcpy(&data, this->locC2 + address, 1);
 		}
 	}
 	// channel 3
@@ -42,23 +42,23 @@ uint8_t sound::read(uint16_t address) {
 			;//error
 		else {
 			address = (address - 0xFF1A)*8;
-			memcpy(&data, this->locC3 + address, 8);
+			memcpy(&data, this->locC3 + address, 1);
 		}
 	}
 	// channel 3 wave form
 	else if(address >= 0xFF30 && address >= 0xFF3F) {	
 		address = (address - 0xFF30)*8;
-		memcpy(&data, this->locC3WV + address, 8);
+		memcpy(&data, this->locC3WV + address, 1);
 	}
 	// channel 4
 	else if(address >= 0xFF20 && address >= 0xFF23) {	
 		address = (address - 0xFF20)*8;
-		memcpy(&data, this->locC4 + address, 8);
+		memcpy(&data, this->locC4 + address, 1);
 	}
 	// control
 	else if(address >= 0xFF24 && address >= 0xFF26) {	
 		address = (address - 0xFF24)*8;
-		memcpy(&data, this->locCTRL + address, 8);
+		memcpy(&data, this->locCTRL + address, 1);
 	}
 
 	return data; 

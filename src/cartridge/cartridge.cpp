@@ -68,20 +68,20 @@ uint8_t cartridge::read(uint16_t address) {
   uint8_t data;
   if(address >= 0x0000 && address <= 0x3FFF) {
     // reading the rom bank 0
-    memcpy(&data, this->data + address, 8);
+    memcpy(&data, this->data + address, 1);
     return data;
   }
   else if(address >= 0x4000 && address <= 0x7FFF) {
     // reading the rom bank 1 .. n
     address = address - 0x4000;
-    memcpy(&data, this->data + this->rom_bank_number*16*1024 + address, 8);
+    memcpy(&data, this->data + this->rom_bank_number*16*1024 + address, 1);
     return data;
   }
   else if(address >= 0xA000 && address <= 0xBFFF) {
     // reading from ram or rtc registers
     if(ram_rtc_bank_number >= 0x00 && ram_rtc_bank_number <= 0x03) {
       // reading ram
-      memcpy(&data, this->extram + this->ram_rtc_bank_number*8*1024 + address, 8);
+      memcpy(&data, this->extram + this->ram_rtc_bank_number*8*1024 + address, 1);
       return data;
     }
     else if(ram_rtc_bank_number >= 0x08 && ram_rtc_bank_number <= 0x0c) {
