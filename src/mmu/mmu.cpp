@@ -1,5 +1,6 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "mmu.hpp"
-#include "stdlib.h"
 
 using namespace std;
 
@@ -104,3 +105,9 @@ int mmu::write8(uint16_t address, uint8_t data) {
 }
 
 
+void mem_seeks(mmu * m) {
+
+	uint16_t address;
+	scanf("%x", &address);
+
+}
