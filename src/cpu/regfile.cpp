@@ -5,18 +5,30 @@ regfile::regfile() {
     set8(i, 0);
 }
 
-reg8 regfile::get8(int idx) {
-  return *((reg8*) (regs + idx));
+uint8_t regfile::get8(int idx) {
+  return *((uint8_t*) (regs + idx));
 }
 
-reg16 regfile::get16(int idx) {
-  return *((reg16*) (regs + idx));
+void regfile::set8(int idx, uint8_t val) {
+  *((uint8_t*) (regs + idx)) = val;
 }
 
-void regfile::set8(int idx, reg8 val) {
-  *((reg8*) (regs + idx)) = val;
+uint16_t regfile::get16(int idx) {
+  return *((uint16_t*) (regs + idx));
 }
 
-void regfile::set16(int idx, reg16 val) {
-  *((reg16*) (regs + idx)) = val;
+void regfile::set16(int idx, uint16_t val) {
+  *((uint16_t*) (regs + idx)) = val;
+}
+
+void regfile::setbit8(int idx, int bit) {
+  *((uint8_t*) (regs + idx)) |= (1 << (bit - 1));
+}
+
+void regfile::clrbit8(int idx, int bit) {
+  *((uint8_t*) (regs + idx)) &= ~(1 << (bit - 1));
+}
+
+bool regfile::chkbit8(int idx, int bit) {
+  return (*((uint8_t*) (regs + idx)) & (1 << (bit - 1))) > 0
 }
