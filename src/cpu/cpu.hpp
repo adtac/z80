@@ -6,9 +6,17 @@
 class cpu {
 private:
 
+  uint16_t pc;
+  uint8_t pc8_read();
+  uint16_t pc16_read();
+
+  alu* a;
+
 public:
 
-  regfile r;
+  regfile* r;
+
+  mmu* m;
 
   cpu();
 

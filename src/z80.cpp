@@ -19,4 +19,14 @@ int main(int argc, char* argv[]) {
   c.add8(REG_A, REG_B);
 
   printf("%d\n", c.r.get8(REG_A));
+
+  int (*tick_callbacks[])() = {NULL};
+
+  clock cl(&c, tick_callbacks);
+
+  int (**tmp)() = fns;
+  while (*tmp != NULL) {
+    printf("ret=%d\n", (**tmp)());
+    tmp++;
+  }
 }
