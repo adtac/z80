@@ -15,7 +15,7 @@ joypad::joypad() {
 
 uint8_t joypad::read(uint16_t address) {
 	uint8_t data;
-	memcpy(&data, this->locFF00, 8);
+	memcpy(&data, this->locFF00, 1);
 	return data; 
 }
 

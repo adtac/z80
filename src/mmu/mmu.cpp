@@ -107,7 +107,11 @@ int mmu::write8(uint16_t address, uint8_t data) {
 
 void mem_seeks(mmu * m) {
 
-	uint16_t address;
+	printf("hello !\n");
+
+	int address;
 	scanf("%x", &address);
+
+	printf("%d", address);
 
 }

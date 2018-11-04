@@ -3,6 +3,7 @@
 #include "cartridge.hpp"
 #include "logging.hpp"
 #include "mmu.hpp"
+#include "mmu.cpp"
 #include "joypad.hpp"
 
 int main(int argc, char* argv[]) {
@@ -19,12 +20,14 @@ int main(int argc, char* argv[]) {
 
   mmu * m = new mmu(j, crt);
 
-  cpu c;
-  c.r.set8(REG_A, 5);
-  c.r.set8(REG_B, 5);
-  c.add8(REG_A, REG_B);
+  mem_seeks(m);
 
-  printf("%d\n", c.r.get8(REG_A));
+  // cpu c;
+  // c.r.set8(REG_A, 5);
+  // c.r.set8(REG_B, 5);
+  // c.add8(REG_A, REG_B);
+
+  // printf("%d\n", c.r.get8(REG_A));
 
 
 }
