@@ -24,6 +24,17 @@
   (x) == (y) ? mask8r(REG_F, ZERO_FLAG) : unmask8r(REG_F, RESET_ZERO_FLAG);
 
 
+void cpu::addi16r(int reg0, int reg1) {
+  reg16 val0 = r.get16(reg0);
+  reg16 val1 = r.get16(reg1);
+
+  r.set16(reg0, val0 + val1);
+  FIX_CARRY((val0 + val1), MAXSUM16);
+}
+
+
+
+
 typedef uint8_t flag8;
 
 void cpu::mask8r(int reg0, flag8 mask) {
@@ -59,6 +70,8 @@ void cpu::add8r(int reg0, int reg1) {
   r.set8(reg0, val0 + val1);
   FIX_CARRY((val0 + val1), MAXSUM8);
 }
+
+
 
 void cpu::add8cy(int reg0, int reg1) {
   reg8 val0 = r.get8(reg0);
