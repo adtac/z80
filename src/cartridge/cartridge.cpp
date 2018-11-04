@@ -60,6 +60,10 @@ int cartridge::init(char* filename) {
     extram = (uint8_t *)calloc(8*1024, sizeof(uint8_t));
   else if(ext_ram_size == 0x03)
     extram = (uint8_t *)calloc(32*1024, sizeof(uint8_t));
+  else {
+    ERROR("invalid external RAM size code");
+    exit(1);
+  }
 
   return 0;
 }
@@ -88,6 +92,10 @@ uint8_t cartridge::read(uint16_t address) {
       // --------- case incomplete ------------
     }
   }
+  else {
+    ERROR("Invalid read address at MBC");
+    exit(1);
+  }
 }
 
 int cartridge::write(uint16_t address, uint8_t data) {
@@ -97,6 +105,9 @@ int cartridge::write(uint16_t address, uint8_t data) {
       ram_rtc_flag = true;
     else if(data == 0x00)
       ram_rtc_flag - false;
+    else 
+      return 1;
+    return 0;
   }
   else if(address >= 0x2000 && address <= 0x3FFF) {
     // rom bank number
@@ -104,10 +115,12 @@ int cartridge::write(uint16_t address, uint8_t data) {
     rom_bank_number = data;
     if (rom_bank_number == 0x00)
       rom_bank_number = 0x01;
+    return 0;
   }
   else if(address >= 0x4000 && address <= 0x5FFF) {
     // ram bank number and RTC register select
     ram_rtc_bank_number = data;
+    return 0;
   }
   else if(address >= 0x6000 && address <= 0x7FFF) {
     // ---------latch clock data----------
@@ -122,6 +135,10 @@ int cartridge::write(uint16_t address, uint8_t data) {
     else if(ram_rtc_bank_number >= 0x08 && ram_rtc_bank_number <= 0x0c) {
       // --------case incomplete-------------
     }
+  }
+  else {
+    ERROR("Invalid write address at MBC");
+    exit(1);
   }
 }
 
