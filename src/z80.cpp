@@ -1,6 +1,6 @@
 #include <cstdio>
 #include "cpu.hpp"
-#include "rom.hpp"
+#include "cartridge.hpp"
 #include "logging.hpp"
 
 int main(int argc, char* argv[]) {
@@ -11,8 +11,9 @@ int main(int argc, char* argv[]) {
 
   cpu c;
 
-  rom r;
-  r.load_file(argv[1]);
+  cartridge * crt = new cartridge();
+
+  crt->init(argv[1]);
 
   c.r.set8(REG_A, 5);
   c.r.set8(REG_B, 5);

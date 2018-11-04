@@ -4,4 +4,5 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 z80
+pokemon-gold.gbc
 *.a
