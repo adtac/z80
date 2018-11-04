@@ -2,9 +2,11 @@
 #define _CPU_H_
 
 #include "regfile.hpp"
+#include "../mmu/mmu.hpp"
 
 class cpu {
 private:
+  mmu * m; 
 
 public:
 

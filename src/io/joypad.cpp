@@ -1,5 +1,4 @@
 #include "joypad.hpp"
-#include "joypad.hpp"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -34,14 +33,14 @@ void joypad::printMemory() {
 
 
 
-// int main() {
+int main() {
 
-// 	joypad *j = new joypad();
+	// joypad *j = new joypad();
 
-// 	j->printMemory();
-// 	j->write(NULL, 0b00100000);
+	// j->printMemory();
+	// j->write(NULL, 0b00100000);
 
-// 	j->printMemory();
+	// j->printMemory();
 
-// }
+}
 

@@ -1,6 +1,7 @@
 #include "cpu.hpp"
 
 cpu::cpu() {
+
 }
 
 void cpu::exec_inst() {

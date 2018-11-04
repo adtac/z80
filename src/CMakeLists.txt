@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-set(MODULES utils cpu rom clock)
+set(MODULES utils cpu cartridge clock io)
 
 foreach(MODULE ${MODULES})
   include_directories(${MODULE})
