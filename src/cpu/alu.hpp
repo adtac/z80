@@ -1,7 +1,7 @@
 #ifndef _ALU_HPP_
 #define _ALU_HPP_
 
-#include "mmu.hpp"
+#include "../mmu/mmu.hpp"
 #include "regfile.hpp"
 
 class alu {

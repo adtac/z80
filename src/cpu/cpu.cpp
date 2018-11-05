@@ -1,6 +1,9 @@
+#include <stdlib.h>
+#include <new>
+
 #include "cpu.hpp"
 #include "regfile.hpp"
-#include "mmu.hpp"
+#include "../mmu/mmu.hpp"
 #include "logging.hpp"
 
 cpu::cpu(mmu* _m) {
@@ -12,11 +15,12 @@ cpu::cpu(mmu* _m) {
   a = (alu*) malloc(sizeof(alu));
   new (a) alu(r, m);
 
-  r->set16(r->G_AF, 0x01B0);
-  r->set16(r->G_BC, 0x0013);
-  r->set16(r->G_DE, 0x00D8);
-  r->set16(r->G_HL, 0x014D);
-  r->set16(r->G_SP, 0xFFFE);
+  r->set16(REG_AF, 0x01B0);
+  r->set16(REG_BC, 0x0013);
+  r->set16(REG_DE, 0x00D8);
+  r->set16(REG_HL, 0x014D);
+  r->set16(REG_SP, 0xFFFE);
+  r->set16(REG_PC, 0x0100);
   m->write8(0xFF05, 0x00); // TIMA
   m->write8(0xFF06, 0x00); // TMA
   m->write8(0xFF07, 0x00); // TAC
@@ -51,21 +55,24 @@ cpu::cpu(mmu* _m) {
 }
 
 uint8_t cpu::pc_read8() {
-  pc = r.get16(REG_PC);
-  uint8_t x = m->read8(pc);
-  a->inc16r(REG_PC);
+  pc = r->get16(REG_PC);
+  uint8_t x = m->read8(r->get16(REG_PC));
+  r->set16(REG_PC, r->get16(REG_PC) + 1);
   return x;
 }
 
 uint16_t cpu::pc_read16() {
-  pc = r.get16(REG_PC);
-  uint16_t x = m->read16(pc);
-  a->inc16r(REG_PC);
-  a->inc16r(REG_PC);
-  return x;
+  pc = r->get16(REG_PC);
+  uint16_t xx = m->read16(r->get16(REG_PC));
+  r->set16(REG_PC, r->get16(REG_PC) + 2);
+  return xx;
 }
 
 int cpu::exec_inst() {
+  #if LOG_LEVEL >= LEVEL_INSTRUCTION
+  r->print();
+  #endif
+
   uint8_t b1 = pc_read8();
 
   uint8_t x;
@@ -215,40 +222,40 @@ int cpu::exec_inst() {
     INST_LD_MXX_A:
       xx = pc_read16();
       m->write8(xx, r->get8(REG_A));
-      INSTRUCTION("ld [0x%4X], a", xx);
+      INSTRUCTION("ld [0x%.4X], a", xx);
       break;
 
     // ld a, [0xFF00 + c]
     case 0xF2:
     INST_LD_A_FC:
       r->set8(REG_A, m->read8(0xFF00 + (uint16_t) r->get8(REG_C)));
-      INSTRUCTION("ld a, [0xFF00 + 0x%2X]", r->get8(REG_C));
+      INSTRUCTION("ld a, [0xFF00 + 0x%.2X]", r->get8(REG_C));
       break;
 
     // ld [0xFF00 + c], a
     case 0xE2:
     INST_LD_FC_A:
       m->write8(0xFF00 + (uint16_t) r->get8(REG_C), r->get8(REG_A));
-      INSTRUCTION("ld [0xFF00 + 0x%2X], a", r->get8(REG_C));
+      INSTRUCTION("ld [0xFF00 + 0x%.2X], a", r->get8(REG_C));
       break;
 
     // TODO: LDD instructions (see pages 71-75 of GBCPUman.pdf)
 
     // ld r0, xx
-    case 0x01: reg0 = BC; c0 = "bc"; goto INST_LD_R0_XX;
-    case 0x11: reg0 = DE; c0 = "de"; goto INST_LD_R0_XX;
-    case 0x21: reg0 = HL; c0 = "hl"; goto INST_LD_R0_XX;
-    case 0x31: reg0 = SP; c0 = "sp"; goto INST_LD_R0_XX;
+    case 0x01: reg0 = REG_BC; c0 = "bc"; goto INST_LD_R0_XX;
+    case 0x11: reg0 = REG_DE; c0 = "de"; goto INST_LD_R0_XX;
+    case 0x21: reg0 = REG_HL; c0 = "hl"; goto INST_LD_R0_XX;
+    case 0x31: reg0 = REG_SP; c0 = "sp"; goto INST_LD_R0_XX;
     INST_LD_R0_XX:
       xx = pc_read16();
-      r->write16(reg0, xx);
+      r->set16(reg0, xx);
       INSTRUCTION("ld %s %u", c0, xx);
       break;
 
     // ld sp, hl
     case 0xF9:
     INST_LD_SP_HL:
-      r->write16(REG_SP, r->read16(REG_HL));
+      r->set16(REG_SP, r->get16(REG_HL));
       INSTRUCTION("ld sp, hl");
       break;
 
@@ -256,7 +263,7 @@ int cpu::exec_inst() {
     case 0xF8:
     INST_LDHL_SP_X:
       x = pc_read8();
-      r->write16(REG_SP, r->read16(REG_HL) + x);
+      r->set16(REG_SP, r->get16(REG_HL) + x);
       INSTRUCTION("ld sp, %u", x);
       break;
 
@@ -265,7 +272,7 @@ int cpu::exec_inst() {
     INST_LD_MXX_SP:
       xx = pc_read16();
       m->write16(xx, r->get16(REG_SP));
-      INSTRUCTION("ld [0x%4X], sp", xx);
+      INSTRUCTION("ld [0x%.4X], sp", xx);
       break;
 
     // push r0
@@ -292,12 +299,12 @@ int cpu::exec_inst() {
 
     // cp a, r1
     case 0xBF: reg1 = REG_A; c1 = "a"; goto INST_CP_A_R1;
-    case 0xBF: reg1 = REG_B; c1 = "b"; goto INST_CP_A_R1;
-    case 0xBF: reg1 = REG_C; c1 = "c"; goto INST_CP_A_R1;
-    case 0xBF: reg1 = REG_D; c1 = "d"; goto INST_CP_A_R1;
-    case 0xBF: reg1 = REG_E; c1 = "e"; goto INST_CP_A_R1;
-    case 0xBF: reg1 = REG_H; c1 = "h"; goto INST_CP_A_R1;
-    case 0xBF: reg1 = REG_L; c1 = "l"; goto INST_CP_A_R1;
+    case 0xB8: reg1 = REG_B; c1 = "b"; goto INST_CP_A_R1;
+    case 0xB9: reg1 = REG_C; c1 = "c"; goto INST_CP_A_R1;
+    case 0xBA: reg1 = REG_D; c1 = "d"; goto INST_CP_A_R1;
+    case 0xBB: reg1 = REG_E; c1 = "e"; goto INST_CP_A_R1;
+    case 0xBC: reg1 = REG_H; c1 = "h"; goto INST_CP_A_R1;
+    case 0xBD: reg1 = REG_L; c1 = "l"; goto INST_CP_A_R1;
     INST_CP_A_R1:
       r->mkbit8(REG_F, BIT_Z, r->get8(REG_A) == r->get8(reg1));
       r->mkbit8(REG_F, BIT_Z, r->get8(REG_A) < r->get8(reg1));
@@ -319,14 +326,14 @@ int cpu::exec_inst() {
     // ccf
     case 0x3F:
     INST_CCF:
-      r->mkbit8(REG_F, BIT_C, !r->chkbit8(REG_F, BIT_C));
+      r->mkbit8(REG_F, BIT_CY, !r->chkbit8(REG_F, BIT_CY));
       INSTRUCTION("ccf");
       break;
 
     // scf
     case 0x37:
     INST_SCF:
-      r->setbit8(REG_F, BIT_C);
+      r->setbit8(REG_F, BIT_CY);
       INSTRUCTION("scf");
       break;
 
@@ -335,11 +342,14 @@ int cpu::exec_inst() {
     INST_HALT:
       INSTRUCTION("HALT");
       INFO("power off");
+      #if LOG_LEVEL >= LEVEL_INSTRUCTION
+      mem_seeks(m);
+      #endif
       exit(1);
       break;
 
-    // add hl, {bc,de,hl,sp}
-    case 0x08: reg1 = REG_BC; c1 = "bc"; goto INST_ADD_HL_R1;
+    // add hl, r1
+    case 0x09: reg1 = REG_BC; c1 = "bc"; goto INST_ADD_HL_R1;
     case 0x19: reg1 = REG_DE; c1 = "de"; goto INST_ADD_HL_R1;
     case 0x29: reg1 = REG_HL; c1 = "hl"; goto INST_ADD_HL_R1;
     case 0x39: reg1 = REG_SP; c1 = "sp"; goto INST_ADD_HL_R1;
@@ -348,7 +358,7 @@ int cpu::exec_inst() {
       INSTRUCTION("add hl, %s", c1);
       break;
 
-    // add a, {b,c,d,e,h,l,a}
+    // add a, r1
     case 0x80: reg1 = REG_B; c1 = "b"; goto INST_ADD_A_R1;
     case 0x81: reg1 = REG_C; c1 = "c"; goto INST_ADD_A_R1;
     case 0x82: reg1 = REG_D; c1 = "d"; goto INST_ADD_A_R1;
@@ -366,7 +376,7 @@ int cpu::exec_inst() {
     INST_JP_XX:
       xx = pc_read16();
       r->set16(REG_PC, xx);
-      INSTRUCTION("jp 0x%4X", xx);
+      INSTRUCTION("jp 0x%.4X", xx);
       break;
     
     // jp cc, xx
@@ -375,10 +385,10 @@ int cpu::exec_inst() {
     case 0xD2: bit0 = BIT_CY; bit1 = 0; c0 = "nc"; goto INST_JP_CC_XX;
     case 0xDA: bit0 = BIT_CY; bit1 = 1; c0 = "c"; goto INST_JP_CC_XX;
     INST_JP_CC_XX:
-      xx = pc_read6();
+      xx = pc_read8();
       if (r->chkbit8(REG_F, bit0) == bit1)
         r->set16(REG_PC, xx);
-      INSTRUCTION("jp %s, 0x%4X", c0, xx);
+      INSTRUCTION("jp %s, 0x%.4X", c0, xx);
       break;
 
     // jp [hl]
@@ -409,15 +419,9 @@ int cpu::exec_inst() {
       break;
 
     default:
-      ERROR("invalid 1-byte instruction 0x%2X at address 0x%4X", b1, r.get16(REG_PC) - 1);
+      ERROR("invalid 1-byte instruction 0x%.2X at address 0x%.4X", b1, r->get16(REG_PC) - 1);
       return -1;
   }
 
   return 0;
-}
-
-void cpu::add8(int reg0, int reg1) {
-  reg8 val0 = r.get8(reg0);
-  reg8 val1 = r.get8(reg1);
-  r.set8(reg0, val0 + val1);
 }

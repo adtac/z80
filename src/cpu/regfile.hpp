@@ -23,7 +23,7 @@
 
 #define REG_PC 10
 
-#define BIT_ZF 7
+#define BIT_Z 7
 #define BIT_N  6
 #define BIT_H  5
 #define BIT_CY 4
@@ -47,6 +47,8 @@ public:
   void setbit8(int, int);
   void clrbit8(int, int);
   bool chkbit8(int, int);
+
+  void print();
 };
 
 #endif

@@ -112,6 +112,8 @@ uint8_t mmu::read8(uint16_t address) {
 		ERROR("Invalid read address at MMU");
 		exit(0);
 	}
+
+  return 0;
 }
 
 int mmu::write8(uint16_t address, uint8_t data) {
@@ -217,14 +219,14 @@ int mmu::write8(uint16_t address, uint8_t data) {
 		ERROR("Invalid write address at MMU");
 		exit(1); 
 	}
+
+  return 0;
 }
 
 uint16_t mmu::read16(uint16_t address) {
-	uint8_t data1 = this->read8(address);
-	uint8_t data2 = this->read8(address+1);
-	uint16_t data;
-	memcpy(&data, &data2, 1);
-	memcpy(&data + 1, &data1, 1);
+	uint16_t data = this->read8(address+1);
+  data <<= 8;
+	data += this->read8(address);
 	return data;
 }
 

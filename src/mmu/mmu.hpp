@@ -38,5 +38,7 @@ class mmu {
 
 };
 
+void mem_seeks(mmu* m);
+
 #endif
 

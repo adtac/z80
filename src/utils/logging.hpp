@@ -57,7 +57,7 @@
 #if defined(LOG_LEVEL) && LOG_LEVEL >= LEVEL_INSTRUCTION
 #define INSTRUCTION(fmt, ...)                                       \
   do {                                                              \
-    fprintf(stdout, "%4x: " fmt "\n",  pc, ##__VA_ARGS__);          \
+    fprintf(stdout, "0x%.4X: " fmt "\n",  pc, ##__VA_ARGS__);       \
   } while (0)
 #else
 #define DEBUG(fmt, args...)

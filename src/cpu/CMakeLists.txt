@@ -6,4 +6,5 @@ file(GLOB LIB_SOURCES *.cpp)
 file(GLOB LIB_HEADERS *.hpp)
 
 add_library(cpu ${LIB_SOURCES} ${LIB_HEADERS})
+target_link_libraries(cpu mmu)
 target_compile_definitions(cpu PUBLIC)

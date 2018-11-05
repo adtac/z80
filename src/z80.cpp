@@ -1,4 +1,5 @@
 #include <cstdio>
+#include "clock.hpp"
 #include "cpu.hpp"
 #include "cartridge.hpp"
 #include "logging.hpp"
@@ -13,29 +14,18 @@ int main(int argc, char* argv[]) {
   }
 
 
-  cartridge * crt = new cartridge();
-  crt->init(argv[1]);
+  cartridge crt;
+  crt.init(argv[1]);
 
-  joypad * j = new joypad();
+  joypad j;
 
-  mmu * m = new mmu(j, crt);
+  mmu m(&j, &crt);
 
-  mem_seeks(m);
-
-  // cpu c;
-  // c.r.set8(REG_A, 5);
-  // c.r.set8(REG_B, 5);
-  // c.add8(REG_A, REG_B);
-
-  // printf("%d\n", c.r.get8(REG_A));
+  cpu c(&m);
 
   int (*tick_callbacks[])() = {NULL};
 
-  clock cl(&c, tick_callbacks);
+  clock clk(&c, tick_callbacks);
 
-  int (**tmp)() = fns;
-  while (*tmp != NULL) {
-    printf("ret=%d\n", (**tmp)());
-    tmp++;
-  }
+  clk.start_ticking();
 }

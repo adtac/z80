@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 #include "clock.hpp"
+#include "logging.hpp"
 
 clock::clock(cpu* _c, int (**_tick_callbacks)()) {
   c = _c;
@@ -12,8 +15,10 @@ void clock::tick() {
   num_ticks++;
 
   int (**tmp)() = tick_callbacks;
-  while (tmp != NULL)
+  while (*tmp != NULL) {
     (**tmp)();
+    tmp++;
+  }
 
   c->exec_inst();
 }
