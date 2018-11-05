@@ -10,28 +10,30 @@ main::
 
   ld [hl], 2
 
-  ld hl, 49152
+  dec hl
 
   ld c, 0
 
-  .loop
+.loop
 
-    ld a, [hl]
-    inc hl
-    ld b, a
+  ld a, [hl]
+  inc hl
+  ld b, a
 
-    ld a, [hl]
-    inc hl
+  ld a, [hl]
+  inc hl
 
-    add a, b
-    ld [hl], a
+  add a, b
+  ld [hl], a
 
-    dec hl
+  dec hl
 
-    ld a, c
-    inc c
+  inc c
 
-    cp 100
-    jr .loop
+  ld b, 100
+  ld a, c
+  cp b
+
+  jr nz, .loop
 
   halt

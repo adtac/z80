@@ -37,6 +37,7 @@ public:
 
   void inc8r(int);
   void inc16r(int);
+  void inc16m(uint16_t);
 
   void dec8r(int);
   void dec16r(int);

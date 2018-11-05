@@ -77,6 +77,8 @@ int cpu::exec_inst() {
 
   uint8_t x;
   uint16_t xx;
+  int8_t xi;
+  int16_t xxi;
   int reg0 = -1;
   int reg1 = -1;
   int bit0 = -1;
@@ -168,8 +170,8 @@ int cpu::exec_inst() {
     case 0x66: reg0 = REG_H; c0 = "h"; goto INST_LD_R0_MHL;
     case 0x6E: reg0 = REG_L; c0 = "l"; goto INST_LD_R0_MHL;
     INST_LD_R0_MHL:
+      INSTRUCTION("ld %s, [hl] = %d", c0, r->get16(REG_HL));
       r->set8(reg0, m->read8(r->get16(REG_HL)));
-      INSTRUCTION("ld %s, [hl]", c0);
       break;
 
     // ld [hl], r1
@@ -307,7 +309,6 @@ int cpu::exec_inst() {
     case 0xBD: reg1 = REG_L; c1 = "l"; goto INST_CP_A_R1;
     INST_CP_A_R1:
       r->mkbit8(REG_F, BIT_Z, r->get8(REG_A) == r->get8(reg1));
-      r->mkbit8(REG_F, BIT_Z, r->get8(REG_A) < r->get8(reg1));
       r->setbit8(REG_F, BIT_N);
       r->setbit8(REG_F, BIT_H);
       INSTRUCTION("cp a, %s", c1);
@@ -371,6 +372,46 @@ int cpu::exec_inst() {
       INSTRUCTION("add a, %s", c1);
       break;
 
+    // inc r0
+    case 0x3C: reg0 = REG_A; c0 = "a"; goto INST_INC8_R0;
+    case 0x04: reg0 = REG_B; c0 = "b"; goto INST_INC8_R0;
+    case 0x0C: reg0 = REG_C; c0 = "c"; goto INST_INC8_R0;
+    case 0x14: reg0 = REG_D; c0 = "d"; goto INST_INC8_R0;
+    case 0x1C: reg0 = REG_E; c0 = "e"; goto INST_INC8_R0;
+    case 0x24: reg0 = REG_H; c0 = "h"; goto INST_INC8_R0;
+    case 0x2C: reg0 = REG_L; c0 = "l"; goto INST_INC8_R0;
+    INST_INC8_R0:
+      a->inc8r(reg0);
+      INSTRUCTION("inc %s", c0);
+      break;
+
+    // inc [hl]
+    case 0x34:
+    INST_INC_MHL:
+      a->inc16m(r->get16(REG_HL));
+      INSTRUCTION("inc [hl]");
+      break;
+
+    // inc r0
+    case 0x03: reg0 = REG_BC; c0 = "bc"; goto INST_INC16_R0;
+    case 0x13: reg0 = REG_DE; c0 = "de"; goto INST_INC16_R0;
+    case 0x23: reg0 = REG_HL; c0 = "hl"; goto INST_INC16_R0;
+    case 0x33: reg0 = REG_SP; c0 = "sp"; goto INST_INC16_R0;
+    INST_INC16_R0:
+      a->inc16r(reg0);
+      INSTRUCTION("inc %s", c0);
+      break;
+
+    // dec r0
+    case 0x0B: reg0 = REG_BC; c0 = "bc"; goto INST_DEC16_R0;
+    case 0x1B: reg0 = REG_DE; c0 = "de"; goto INST_DEC16_R0;
+    case 0x2B: reg0 = REG_HL; c0 = "hl"; goto INST_DEC16_R0;
+    case 0x3B: reg0 = REG_SP; c0 = "sp"; goto INST_DEC16_R0;
+    INST_DEC16_R0:
+      a->dec16r(reg0);
+      INSTRUCTION("dec %s", c0);
+      break;
+
     // jp xx
     case 0xC3:
     INST_JP_XX:
@@ -398,12 +439,15 @@ int cpu::exec_inst() {
       INSTRUCTION("jp [hl]");
       break;
     
-    // jp x
+    // jr x
     case 0x18:
-    INST_JP_X:
+    INST_JR_X:
       x = pc_read8();
-      r->set16(REG_PC, r->get16(REG_PC) + (uint16_t) x);
-      INSTRUCTION("jp %u", x);
+      xi = x;
+      xxi = xi;
+      xx = xxi;
+      r->set16(REG_PC, r->get16(REG_PC) + xx);
+      INSTRUCTION("jr %d", xx);
       break;
 
     // jr cc, x
@@ -413,8 +457,11 @@ int cpu::exec_inst() {
     case 0x38: bit0 = BIT_CY; bit1 = 1; c0 = "c"; goto INST_JP_CC_X;
     INST_JP_CC_X:
       x = pc_read8();
+      xi = x;
+      xxi = xi;
+      xx = xxi;
       if (r->chkbit8(REG_F, bit0) == bit1)
-        r->set16(REG_PC, r->get16(REG_PC) + (uint16_t) x);
+        r->set16(REG_PC, r->get16(REG_PC) + xx);
       INSTRUCTION("jr %s, %d", c0, x);
       break;
 

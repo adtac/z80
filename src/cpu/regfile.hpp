@@ -23,10 +23,10 @@
 
 #define REG_PC 10
 
-#define BIT_Z 7
-#define BIT_N  6
-#define BIT_H  5
-#define BIT_CY 4
+#define BIT_Z 8
+#define BIT_N  7
+#define BIT_H  6
+#define BIT_CY 5
 
 class regfile {
 private:

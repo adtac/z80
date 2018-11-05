@@ -108,12 +108,18 @@ void alu::sbc16r(int reg0, int reg1) {
   sbc16c(reg0, r->get16(reg1));
 }
 
+// TODO: do flag stuff for inc/dec
+
 void alu::inc8r(int reg0) {
   r->set8(reg0, r->get8(reg0) + 1);
 }
 
 void alu::inc16r(int reg0) {
   r->set16(reg0, r->get16(reg0) + 1);
+}
+
+void alu::inc16m(uint16_t addr) {
+  m->write16(addr, m->read16(addr) + 1);
 }
 
 void alu::dec8r(int reg0) {
