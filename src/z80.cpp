@@ -1,7 +1,11 @@
 #include <cstdio>
+#include "clock.hpp"
 #include "cpu.hpp"
-#include "rom.hpp"
+#include "cartridge.hpp"
 #include "logging.hpp"
+#include "mmu.hpp"
+#include "mmu.cpp"
+#include "joypad.hpp"
 
 int main(int argc, char* argv[]) {
   if (argc != 2) {
@@ -9,14 +13,19 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  cpu c;
 
-  rom r;
-  r.load_file(argv[1]);
+  cartridge crt;
+  crt.init(argv[1]);
 
-  c.r.set8(REG_A, 5);
-  c.r.set8(REG_B, 5);
-  c.add8(REG_A, REG_B);
+  joypad j;
 
-  printf("%d\n", c.r.get8(REG_A));
+  mmu m(&j, &crt);
+
+  cpu c(&m);
+
+  int (*tick_callbacks[])() = {NULL};
+
+  clock clk(&c, tick_callbacks);
+
+  clk.start_ticking();
 }

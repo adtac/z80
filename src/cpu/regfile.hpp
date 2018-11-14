@@ -23,8 +23,10 @@
 
 #define REG_PC 10
 
-typedef uint8_t reg8;
-typedef uint16_t reg16;
+#define BIT_Z 8
+#define BIT_N  7
+#define BIT_H  6
+#define BIT_CY 5
 
 class regfile {
 private:
@@ -35,13 +37,18 @@ public:
   
   regfile();
 
-  reg8 get8(int);
+  uint8_t get8(int);
+  void set8(int, uint8_t);
   
-  reg16 get16(int);
+  uint16_t get16(int);
+  void set16(int, uint16_t);
 
-  void set8(int, reg8);
+  void mkbit8(int, int, bool);
+  void setbit8(int, int);
+  void clrbit8(int, int);
+  bool chkbit8(int, int);
 
-  void set16(int, reg16);
+  void print();
 };
 
 #endif
